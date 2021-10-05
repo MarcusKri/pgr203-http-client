@@ -16,15 +16,19 @@ class HttpClientTest {
     @Test
     void shouldReturnStatusCode() throws IOException {
        HttpClient client = new HttpClient("httpbin.org", 80, "/html");
-        System.out.println(client.getStatusCode());
        assertEquals(200, client.getStatusCode());
+    }
+
+    @Test
+    void shouldReturnHeaderFields() throws IOException {
+        HttpClient client = new HttpClient("httpbin.org", 80, "/html");
+        assertEquals("text/html; charset=utf-8", client.getHeader("Content-Type"));
     }
 
 
     @Test
     void shouldReturn404StatusCode() throws IOException {
         HttpClient client = new HttpClient("httpbin.org", 80, "/this-page-does-not-exist");
-        System.out.println(client.getStatusCode());
         assertEquals(404, client.getStatusCode());
     }
 
