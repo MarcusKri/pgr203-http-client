@@ -5,12 +5,32 @@ import java.io.InputStream;
 import java.net.Socket;
 
 public class HttpClient {
-    public HttpClient(String host, int port, String requestTarget) {
 
+    private final int statusCode;
+
+    public HttpClient(String host, int port, String requestTarget) throws IOException {
+        Socket socket = new Socket(host, port);
+
+        socket.getOutputStream().write(
+                ("GET " + requestTarget + " HTTP/1.1\r\n" +
+                        "Connection: close\r\n" +
+                        "Host: " + host + "\r\n" +
+                        "\r\n").getBytes()
+        );
+
+        StringBuilder result = new StringBuilder();
+        InputStream in = socket.getInputStream();
+        int c;
+        while ((c = in.read()) != -1){
+            result.append((char)c);
+        }
+        String responseMessage = result.toString();
+        System.out.println("Check response message" + responseMessage);
+        this.statusCode = Integer.parseInt(responseMessage.split(" ")[1]);
     }
 
     public int getStatusCode() {
-        return 200;
+        return statusCode;
     }
 
     public static void main(String[] args) throws IOException {
@@ -18,15 +38,16 @@ public class HttpClient {
 
         socket.getOutputStream().write(
                 ("GET /html HTTP/1.1\r\n" +
+                 "Connection: close\r\n" +
                 "Host: httpbin.org\r\n" +
                         "\r\n").getBytes()
-
         );
 
+        StringBuilder result = new StringBuilder();
         InputStream in = socket.getInputStream();
         int c;
         while ((c = in.read()) != -1){
-            System.out.println((char)c);
+            result.append((char)c);
         }
     }
 }
