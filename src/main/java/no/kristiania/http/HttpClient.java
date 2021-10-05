@@ -8,6 +8,7 @@ import java.util.HashMap;
 public class HttpClient {
 
     private final int statusCode;
+    private final String messageBody;
     private HashMap<String, String> headerFields = new HashMap<>();
 
     public HttpClient(String host, int port, String requestTarget) throws IOException {
@@ -27,9 +28,21 @@ public class HttpClient {
         while (!(headerLine = readLine(socket)).isBlank()) {
             int colonPos = headerLine.indexOf(':');
             String key = headerLine.substring(0, colonPos);
-            String value = headerLine.substring(colonPos+1).trim();
+            String value = headerLine.substring(colonPos + 1).trim();
             headerFields.put(key, value);
         }
+
+        this.messageBody = readCharacters(socket, getContentLength());
+    }
+
+    private String readCharacters(Socket socket, int contentLength) throws IOException {
+        StringBuilder result = new StringBuilder();
+        InputStream in = socket.getInputStream();
+
+        for (int i = 0; i < contentLength; i++) {
+            result.append((char) in.read());
+        }
+        return result.toString();
     }
 
     private String readLine(Socket socket) throws IOException {
@@ -72,6 +85,10 @@ public class HttpClient {
     }
 
     public int getContentLength() {
-        return 0;
+        return Integer.parseInt(getHeader("Content-Length"));
+    }
+
+    public String getMessageBody() {
+        return messageBody;
     }
 }
