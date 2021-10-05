@@ -19,14 +19,19 @@ public class HttpClient {
         );
 
         StringBuilder result = new StringBuilder();
+
+        String statusLine = readLine(socket);
+        this.statusCode = Integer.parseInt(statusLine.split(" ")[1]);
+    }
+
+    private String readLine(Socket socket) throws IOException {
+        StringBuilder result = new StringBuilder();
         InputStream in = socket.getInputStream();
         int c;
-        while ((c = in.read()) != -1){
-            result.append((char)c);
+        while ((c = in.read()) != -1 && c != '\r') {
+            result.append((char) c);
         }
-        String responseMessage = result.toString();
-        System.out.println("Check response message" + responseMessage);
-        this.statusCode = Integer.parseInt(responseMessage.split(" ")[1]);
+        return result.toString();
     }
 
     public int getStatusCode() {
@@ -43,11 +48,15 @@ public class HttpClient {
                         "\r\n").getBytes()
         );
 
-        StringBuilder result = new StringBuilder();
+
         InputStream in = socket.getInputStream();
         int c;
         while ((c = in.read()) != -1){
-            result.append((char)c);
+            System.out.print((char)c);
         }
+    }
+
+    public String getHeader(String s) {
+        return null;
     }
 }
